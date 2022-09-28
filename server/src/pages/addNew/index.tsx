@@ -2,9 +2,9 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import styles from "../../index.module.css";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../utils/trpc";
 
-const NewMessage: NextPage = () => {
+const AddNew: NextPage = () => {
   const { mutate } = trpc.useMutation(["messages.addMessage"]);
 
   const [message, setMessage] = useState<null | string>(null);
@@ -40,4 +40,4 @@ const NewMessage: NextPage = () => {
   );
 };
 
-export default NewMessage;
+export default AddNew;

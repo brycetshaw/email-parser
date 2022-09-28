@@ -14,8 +14,10 @@ type IMessage =(Message & {
 })[] 
 
 const Home: NextPage = () => {
+  const { mutate } = trpc.useMutation(["messages.addMessage"]);
 
   const { data } = trpc.useQuery(["messages.getAll"]);
+  const [message, setMessage] = useState<null | string>(null);
   return (
     <>
       <Head>
@@ -35,6 +37,18 @@ const Home: NextPage = () => {
           : <div>Loading</div>
           }
         </div>
+        <textarea style={{whiteSpace: 'pre'}} onChange={(e) => setMessage(e.target.value)}></textarea>
+          <button
+            disabled={!message}
+            onClick={() => {
+              console.log(message);
+              if (message) {
+                mutate({ message });
+              }
+            }}
+          >
+            Submit
+          </button>
       </div>
     </>
   );
