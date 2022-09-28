@@ -10,24 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+  // const {from, text, subject,  date, to} = await simpleParser(message)
 model Message {
   id          String   @id @default(cuid())
   from Person @relation("sentEmails", fields: [senderEmail], references: [email])
   to  Person[] @relation("recievedEmails")
   subject String?
+  date DateTime?
   text String //plaintext version of the message
-  html String? // html version of the message
   senderEmail String
-  attachments Attachment[]
-}
+  }
 
-model Attachment {
-  id        String   @id @default(cuid())
-  name      String?
-  contents  Bytes
-  Message   Message? @relation(fields: [messageId], references: [id])
-  messageId String?
-}
+// model Attachment {
+//   id        String   @id @default(cuid())
+//   name      String?
+//   contents  Bytes
+//   Message   Message? @relation(fields: [messageId], references: [id])
+//   messageId String?
+// }
 
 model Person {
   id               Int       @id @default(autoincrement())
