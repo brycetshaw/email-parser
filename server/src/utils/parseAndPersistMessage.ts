@@ -1,11 +1,18 @@
 import { Person } from "@prisma/client";
-import { EmailAddress, simpleParser } from "mailparser";
+import console from "console";
+import { EmailAddress, ParsedMail } from "mailparser";
 
-export async function parseAndPersistMessage(message: string): Promise<boolean> {
+export async function parseAndPersistMessage(
+  message: ParsedMail
+): Promise<boolean> {
   try {
-    // parse the message
-    const { from, text, subject, date, to } = await simpleParser(message);
 
+    console.log("sdklfjklsdfjklasdjklfasdjkl")
+    // parse the message
+    const { from, text, subject, date, to } = message
+
+    // const parsed = await simpleParser(message);
+    console.log("from:",from)
     // This only supports single recipients at the moment.
     const recipient = ((Array.isArray(to) && to[0]?.value) ||
       (!Array.isArray(to) && to?.value)) as EmailAddress | undefined;
@@ -16,6 +23,8 @@ export async function parseAndPersistMessage(message: string): Promise<boolean> 
       createOrFindPerson(recipient),
     ]);
 
+    console.log("asdfklasdjkljklasd")
+    console.log(fromPerson, toPerson)
     // persist the message
     prisma?.message.create({
       data: {
@@ -27,6 +36,7 @@ export async function parseAndPersistMessage(message: string): Promise<boolean> 
       },
     });
   } catch {
+    console.log("whioopwe")
     return false;
   }
 
@@ -36,10 +46,20 @@ export async function parseAndPersistMessage(message: string): Promise<boolean> 
 async function createOrFindPerson(
   emailAddress: EmailAddress | undefined
 ): Promise<Person | undefined> {
-  if (!emailAddress || !emailAddress.address)
+
+
+  console.log(emailAddress)
+  if (!emailAddress || !emailAddress.address) {
+
+    console.log("buuttsd")
     throw new Error("Email required!");
 
+  }
+
+
   const { name, address } = emailAddress;
+  
+  console.log(name, address)
 
   return (
     (await prisma?.person.findUnique({ where: { email: address } })) ??

@@ -1,17 +1,15 @@
-import { Attachment, Message, Person } from "@prisma/client";
+import { Message, Person } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import styles from "./index.module.css";
-import messages from "./messages/[messageId]";
 import { useRouter } from "next/router";
 
-type IMessage =(Message & {
+type IMessage = (Message & {
   from: Person;
   to: Person[];
-  attachments: Attachment[];
-})[] 
+})[];
 
 const Home: NextPage = () => {
   const { mutate } = trpc.useMutation(["messages.addMessage"]);
@@ -30,25 +28,23 @@ const Home: NextPage = () => {
           <h1 className={styles.title}>
             Email <span className={styles.titlePink}>Search</span> Service
           </h1>
-          {
-            data ?
-
-          <MessageTable  data={data} />
-          : <div>Loading</div>
-          }
+          {data ? <MessageTable data={data} /> : <div>Loading</div>}
         </div>
-        <textarea style={{whiteSpace: 'pre'}} onChange={(e) => setMessage(e.target.value)}></textarea>
-          <button
-            disabled={!message}
-            onClick={() => {
-              console.log(message);
-              if (message) {
-                mutate({ message });
-              }
-            }}
-          >
-            Submit
-          </button>
+        <textarea
+          style={{ whiteSpace: "pre" }}
+          onChange={(e) => setMessage(e.target.value)}
+        ></textarea>
+        <button
+          disabled={!message}
+          onClick={() => {
+            console.log(message);
+            if (message) {
+              mutate({ message });
+            }
+          }}
+        >
+          Submit
+        </button>
       </div>
     </>
   );
@@ -56,10 +52,7 @@ const Home: NextPage = () => {
 
 export default Home;
 
-
-const MessageTable = ({data}: {data: IMessage}) => {
-
-
+const MessageTable = ({ data }: { data: IMessage }) => {
   const headers = ["Sender", "Subject"];
 
   return (
@@ -69,13 +62,9 @@ const MessageTable = ({data}: {data: IMessage}) => {
           <th key={subject}>{subject}</th>
         ))}
       </tr>
-   {     data?.map((message) => (
-          <MessageTableRow
-            message={message}
-            key={`message=${message.id}`}
-          />
-        )
-      )}
+      {data?.map((message) => (
+        <MessageTableRow message={message} key={`message=${message.id}`} />
+      ))}
     </table>
   );
 };
@@ -85,12 +74,11 @@ const MessageTableRow = ({
 }: {
   message: Message;
 }) => {
-
- const router = useRouter()
+  const router = useRouter();
   return (
     <tr
       onClick={() => {
-        router.push(`messages/${id}`)
+        router.push(`messages/${id}`);
       }}
     >
       <td>{senderEmail}</td>

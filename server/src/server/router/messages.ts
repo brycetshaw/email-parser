@@ -2,6 +2,7 @@ import { createRouter } from "./context";
 import { z } from "zod";
 import console from "console";
 import { parseAndPersistMessage } from "../../utils/parseAndPersistMessage";
+import { getSomeEmails } from "../../utils/getEmails";
 
 export const messagesRouter = createRouter()
   .query("getById", {
@@ -50,6 +51,7 @@ export const messagesRouter = createRouter()
     resolve: async ({ input }) => {
       console.log("wasssup")
       console.log(input.message);
+      await getSomeEmails()
       return await parseAndPersistMessage(input.message)
     },
   });
