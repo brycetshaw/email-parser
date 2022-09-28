@@ -12,11 +12,12 @@ datasource db {
 
 model Message {
   id          String   @id @default(cuid())
-  headers     String
-  body        String
+  from Person @relation("sentEmails", fields: [senderEmail], references: [email])
+  to  Person[] @relation("recievedEmails")
+  subject String?
+  text String //plaintext version of the message
+  html String? // html version of the message
   senderEmail String
-  sender      Person   @relation("sentEmails", fields: [senderEmail], references: [email])
-  recipients  Person[] @relation("recievedEmails")
   attachments Attachment[]
 }
 
