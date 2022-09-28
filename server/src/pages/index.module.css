@@ -200,3 +200,7 @@
 .signInButton:hover {
   background-color: rgba(237, 233, 254, 100%);
 }
+
+.activeRow {
+  background-color: beige;
+}

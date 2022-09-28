@@ -4,9 +4,8 @@ import Head from "next/head";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import styles from "./index.module.css";
-import { useRouter } from "next/router";
 import {
-  Flex,
+  Button,
   Grid,
   GridItem,
   Table,
@@ -15,6 +14,7 @@ import {
   Th,
   Tr,
 } from "@chakra-ui/react";
+import { ImportEmailsModal } from "../components/importEmails";
 
 type IMessage = Message & {
   from: Person;
@@ -22,10 +22,11 @@ type IMessage = Message & {
 };
 
 const Home: NextPage = () => {
-  const { mutate } = trpc.useMutation(["messages.addMessage"]);
-
   const { data } = trpc.useQuery(["messages.getAll"]);
-  const [message, setMessage] = useState<undefined| IMessage>();
+  const [message, setMessage] = useState<undefined | IMessage>();
+
+  const [openImports, setOpenImports] = useState(false);
+
   return (
     <>
       <Head>
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
         <div className={styles.containerInner}>
           <h1 className={styles.title}>
             Email <span className={styles.titlePink}>Search</span> Service
+            <Button onClick={() => setOpenImports(true)}>Import!</Button>
           </h1>
 
           <Grid
@@ -54,13 +56,20 @@ const Home: NextPage = () => {
             </GridItem>
             <GridItem rowSpan={4} colSpan={1}>
               {data ? (
-                <MessageTable data={data} setMessage={setMessage}  activeMessage={message}/>
+                <MessageTable
+                  data={data}
+                  setMessage={setMessage}
+                  activeMessage={message}
+                />
               ) : (
                 <div>Loading...</div>
               )}
             </GridItem>
           </Grid>
         </div>
+        {openImports && (
+          <ImportEmailsModal onClose={() => setOpenImports(false)} />
+        )}
       </div>
     </>
   );
@@ -101,22 +110,16 @@ const MessageTable = ({
 };
 
 const MessageTableRow = ({
-  message: { senderEmail, subject, id },
+  message: { senderEmail, subject },
   active,
-  onClick
+  onClick,
 }: {
   message: Message;
   active: boolean;
-  onClick: () => void
+  onClick: () => void;
 }) => {
-  const router = useRouter();
-
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Tr
-      onClick={onClick}
-    >
+    <Tr className={active ? styles.activeRow : ""} onClick={onClick}>
       <Td>{senderEmail}</Td>
       <Td>{subject}</Td>
     </Tr>
