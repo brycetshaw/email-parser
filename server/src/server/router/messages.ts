@@ -1,7 +1,7 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import console from "console";
-import { postEmail } from "../../utils/postEmail";
+import { parseAndPersistMessage } from "../../utils/parseAndPersistMessage";
 
 export const messagesRouter = createRouter()
   .query("getById", {
@@ -16,7 +16,6 @@ export const messagesRouter = createRouter()
       return prisma?.message.findUnique({
         where: { id: "fjdf" },
         select: {
-          attachments: true,
           from: true,
           to: true,
           text: true,
@@ -39,11 +38,9 @@ export const messagesRouter = createRouter()
   })
   .query("getAll", {
     async resolve({ ctx }) {
-      const messages = await await ctx.prisma.message.findMany({
-        include: { from: true, to: true, attachments: true },
+      return ctx.prisma.message.findMany({
+        include: { from: true, to: true, },
       });
-
-      return messages;
     },
   })
   .mutation("addMessage", {
@@ -53,6 +50,6 @@ export const messagesRouter = createRouter()
     resolve: async ({ input }) => {
       console.log("wasssup")
       console.log(input.message);
-      return await postEmail(input.message);
+      return await parseAndPersistMessage(input.message)
     },
   });

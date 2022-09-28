@@ -1,4 +1,4 @@
-import { getSender } from "./emailParser";
+import { getSender } from "./parseAndPersistMessage";
 
 describe("run some parser tests ", () => {
   it("should parse out the name", () => {
