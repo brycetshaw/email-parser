@@ -12,6 +12,9 @@
     "format": "prettier -w ."
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.3.4",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
     "@prisma/client": "^4.3.1",
     "@trpc/client": "^9.27.2",
     "@trpc/next": "^9.27.2",
@@ -19,6 +22,7 @@
     "@trpc/server": "^9.27.2",
     "@types/mailparser": "^3.4.0",
     "@types/node-imap": "^0.9.0",
+    "framer-motion": "^7.4.0",
     "jest": "^29.0.3",
     "mailparser": "^3.5.0",
     "next": "12.3.1",
