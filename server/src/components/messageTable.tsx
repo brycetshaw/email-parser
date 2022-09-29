@@ -1,5 +1,13 @@
 import { Message } from "@prisma/client";
-import { Table, TableContainer, Td, Th, Tr } from "@chakra-ui/react";
+import {
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 
 import styles from "./messageTable.module.css";
 export const MessageTable = ({
@@ -16,19 +24,21 @@ export const MessageTable = ({
   return (
     <TableContainer>
       <Table>
-        <Tr>
-          {headers.map((subject) => (
-            <Th key={subject}>{subject}</Th>
+        <Tbody>
+          <Tr>
+            {headers.map((subject) => (
+              <Th key={subject}>{subject}</Th>
+            ))}
+          </Tr>
+          {data?.map((message) => (
+            <MessageTableRow
+              message={message}
+              onClick={() => setMessage(message)}
+              active={activeMessage?.id === message.id}
+              key={`message=${message.id}`}
+            />
           ))}
-        </Tr>
-        {data?.map((message) => (
-          <MessageTableRow
-            message={message}
-            onClick={() => setMessage(message)}
-            active={activeMessage?.id === message.id}
-            key={`message=${message.id}`}
-          />
-        ))}
+        </Tbody>
       </Table>
     </TableContainer>
   );
