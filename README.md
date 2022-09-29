@@ -1,7 +1,3 @@
-# JSI Applicant Test
-
-I would rather I had gotten further in this, but so it goes.
-
 ## 1 - Data Modeling
 
 Written as typescript interfaces, the resulting data shapes would look something like this:
