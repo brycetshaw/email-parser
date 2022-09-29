@@ -1,57 +1,48 @@
 import { createRouter } from "./context";
 import { z } from "zod";
-import console from "console";
-import { parseAndPersistMessage } from "../../utils/parseAndPersistMessage";
 import { getSomeEmails } from "../../utils/getEmails";
 
 export const messagesRouter = createRouter()
-  .query("getById", {
+  .query("getFiltered", {
     input: z
       .object({
-        id: z.string(),
+        id: z.string().nullable(),
+        sender: z.string().nullable(),
+        recipient: z.string().nullable(),
+        page: z.number(),
       })
       .nullish(),
     async resolve({ input }) {
-      if (!input?.id == null) return;
+      if (!prisma) throw new Error("invalid DB context");
 
-      return prisma?.message.findUnique({
-        where: { id: "fjdf" },
-        select: {
-          from: true,
-          to: true,
-          text: true,
-          subject: true,
+      const { id, recipient, sender, page } = input ?? {};
+      const take = 10;
+      const skip = (page ?? 0) * take;
+      if (id != null) {
+        return prisma.message.findUnique({
+          where: { id },
+          include: { from: true, to: true },
+        });
+      }
+
+      return prisma.message.findMany({
+        where: {
+          ...(sender && { senderEmail: { equals: sender } }),
+          ...(recipient && { recipient: { equals: recipient } }),
         },
-      });
-    },
-  })
-  .query("getBySender", {
-    input: z
-      .object({
-        senderEmail: z.string(),
-      })
-      .nullish(),
-    async resolve({ input }) {
-      return prisma?.message.findMany({
-        where: { senderEmail: input?.senderEmail },
-      });
-    },
-  })
-  .query("getAll", {
-    async resolve({ ctx }) {
-      return ctx.prisma.message.findMany({
-        include: { from: true, to: true, },
+        include: { from: true, to: true },
+        orderBy: { date: "asc" },
+        skip,
+        take,
       });
     },
   })
   .mutation("addMessage", {
     input: z.object({
-      message: z.string(),
+      username: z.string().nullable(),
+      password: z.string().nullable(),
     }),
-    resolve: async ({ input }) => {
-      console.log("wasssup")
-      console.log(input.message);
-      await getSomeEmails()
-      return await parseAndPersistMessage(input.message)
+    resolve: async ({ input: { username, password } }) => {
+      await getSomeEmails("shaw.bryce@gmail.com", "mvlrptczkeknaank");
     },
   });

@@ -9,7 +9,9 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "test": "jest",
-    "format": "prettier -w ."
+    "format": "prettier -w .",
+    "migrate": "prisma migrate dev",
+    "stand-up": "cd ../ && docker-compose up -d"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.3.4",

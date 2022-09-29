@@ -16,13 +16,15 @@ import {
 } from "@chakra-ui/react";
 import { ImportEmailsModal } from "../components/importEmails";
 
-type IMessage = Message & {
-  from: Person;
-  to: Person[];
-};
+type IMessage =
+  | (Message & {
+      from: Person;
+      to: Person[];
+    })
+  | Message;
 
 const Home: NextPage = () => {
-  const { data } = trpc.useQuery(["messages.getAll"]);
+  const { data } = trpc.useQuery(["messages.getFiltered"]);
   const [message, setMessage] = useState<undefined | IMessage>();
 
   const [openImports, setOpenImports] = useState(false);
@@ -57,7 +59,7 @@ const Home: NextPage = () => {
             <GridItem rowSpan={4} colSpan={1}>
               {data ? (
                 <MessageTable
-                  data={data}
+                  data={data as IMessage[]}
                   setMessage={setMessage}
                   activeMessage={message}
                 />

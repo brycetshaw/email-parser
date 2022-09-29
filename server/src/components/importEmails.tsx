@@ -2,6 +2,7 @@ import {
   Button,
   Input,
   InputGroup,
+  Text,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,15 +11,28 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
+  InputLeftElement,
+  InputLeftAddon,
+  NumberInputProps,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { trpc } from "../utils/trpc";
+
+interface Inputs {
+  email: string | undefined | null;
+}
 
 export function ImportEmailsModal({
   onClose,
 }: {
   onClose: () => void;
 }): JSX.Element {
-  const [stuff, setStuff] = useState<string>("");
+  const { mutate } = trpc.useMutation(["messages.addMessage"], {
+    onSuccess: async () => {
+      await trpc.useContext().invalidateQueries(["messages.getFiltered"]);
+    },
+  });
+  const [stuff, setStuff] = useState<Inputs>({ email: "" });
 
   return (
     <Modal isOpen={true} onClose={onClose}>
@@ -28,18 +42,35 @@ export function ImportEmailsModal({
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing={3}>
-            <InputGroup onSubmit={(e) =>console.log(e) }>
-              <Input
-                placeholder="medium size"
-                size="md"
-                onChange={(e) => setStuff(e.target.value)}
-              />
- 
-              <Input placeholder="medium size" size="md"/>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                console.log();
+              }}
+            >
+              <InputGroup>
+                <InputLeftAddon>Email</InputLeftAddon>
+
+                <Input
+                  placeholder="medium size"
+                  title="lol"
+                  size="md"
+                  value={stuff.email as string}
+                  onChange={(e) =>
+                    setStuff({ ...stuff, email: e.target.textContent })
+                  }
+                />
+              </InputGroup>
+
+              <Input placeholder="medium size" size="md" />
               <Input placeholder="medium size" size="md" />
 
-              <Button type='submit'>Submit</Button>
-            </InputGroup>
+              <Button
+                onClick={() => mutate({ password: null, username: null })}
+              >
+                Submit
+              </Button>
+            </form>
           </Stack>
         </ModalBody>
 
