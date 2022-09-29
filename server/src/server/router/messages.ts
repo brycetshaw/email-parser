@@ -53,10 +53,14 @@ export const messagesRouter = createRouter()
     },
   })
 
-  .query("getPeople", {
+  .query("getSenders", {
     input: z.object({}).nullish(),
     async resolve({ input }) {
       if (!prisma) throw new Error("invalid DB context");
-      return prisma.person.findMany();
+      const peopleOptions = await prisma.person.findMany({
+        include: { _count: { select: { sentMessages: true } } },
+      });
+
+      return peopleOptions?.filter(({ _count }) => _count.sentMessages);
     },
   });

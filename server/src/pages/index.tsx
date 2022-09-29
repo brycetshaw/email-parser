@@ -24,7 +24,7 @@ const Home: NextPage = () => {
     page,
     sender,
     setSender,
-    peopleOptions,
+    senderOptions,
     data,
     setActiveMessage,
     activeMessage,
@@ -63,7 +63,7 @@ const Home: NextPage = () => {
                       Sender{sender ? `: ${sender}` : ""}
                     </MenuButton>
                     <MenuList>
-                      {[{ email: "None" }, ...(peopleOptions ?? [])]?.map(
+                      {[{ email: "None" }, ...(senderOptions ?? [])]?.map(
                         ({ email }) => (
                           <MenuItem
                             onClick={(e) =>
@@ -127,12 +127,12 @@ function useFilteredData() {
   useEffect(() => {
     setActiveMessage(undefined);
   }, [page, sender]);
-  const { data: peopleOptions } = trpc.useQuery(["messages.getPeople"]);
+  const { data: senderOptions } = trpc.useQuery(["messages.getSenders"]);
 
   const { data } = trpc.useQuery(["messages.getFiltered", { page, sender }]);
 
   return {
-    peopleOptions,
+    senderOptions,
     page,
     setPage,
     sender,
