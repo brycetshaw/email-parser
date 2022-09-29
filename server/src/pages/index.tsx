@@ -19,10 +19,16 @@ import { ImportEmailsModal } from "../components/importEmails";
 import { MessageTable } from "../components/messageTable";
 
 const Home: NextPage = () => {
-  const { setPage, page, sender, setSender, peopleOptions, data } =
-    useFilteredData();
-
-  const [message, setMessage] = useState<undefined | Message>();
+  const {
+    setPage,
+    page,
+    sender,
+    setSender,
+    peopleOptions,
+    data,
+    setActiveMessage,
+    activeMessage,
+  } = useFilteredData();
 
   const [openImports, setOpenImports] = useState(false);
 
@@ -37,17 +43,19 @@ const Home: NextPage = () => {
       <div className={styles.containerOuter}>
         <div className={styles.containerInner}>
           <h1 className={styles.title}>
-            Email <span className={styles.titlePink}>Search</span> Service
-            <Button onClick={() => setOpenImports(true)}>Import!</Button>
+            <div>
+              Email <span className={styles.titlePink}>Search</span> Service
+            </div>
+            <Button
+              className={styles.importButton}
+              onClick={() => setOpenImports(true)}
+            >
+              Import!
+            </Button>
           </h1>
 
-          <Grid
-            className={styles.containerGrid}
-            gap={1}
-            templateRows="repeat(5, 1fr)"
-            templateColumns="repeat(3, 1fr)"
-          >
-            <GridItem>
+          <div className={styles.row}>
+            <div className={styles.column}>
               <Stack>
                 <StackItem>
                   <Menu>
@@ -55,14 +63,18 @@ const Home: NextPage = () => {
                       Sender{sender ? `: ${sender}` : ""}
                     </MenuButton>
                     <MenuList>
-                      {peopleOptions?.map(({ email }) => (
-                        <MenuItem
-                          onClick={(e) => setSender(email)}
-                          key={`sender-option-${email}`}
-                        >
-                          {email}
-                        </MenuItem>
-                      ))}
+                      {[{ email: "None" }, ...(peopleOptions ?? [])]?.map(
+                        ({ email }) => (
+                          <MenuItem
+                            onClick={(e) =>
+                              setSender(email === "None" ? undefined : email)
+                            }
+                            key={`sender-option-${email}`}
+                          >
+                            {email}
+                          </MenuItem>
+                        )
+                      )}
                     </MenuList>
                   </Menu>
                 </StackItem>
@@ -77,22 +89,21 @@ const Home: NextPage = () => {
                   <Button onClick={() => setPage(page + 1)}>{">"}</Button>
                 </StackItem>
               </Stack>
-            </GridItem>
-            <GridItem colSpan={2} rowSpan={5} bg={"lightgrey"}>
-              {message?.text}
-            </GridItem>
-            <GridItem rowSpan={4} colSpan={1}>
-              {data ? (
-                <MessageTable
-                  data={data as Message[]}
-                  setMessage={setMessage}
-                  activeMessage={message}
-                />
-              ) : (
-                <div>Loading...</div>
-              )}
-            </GridItem>
-          </Grid>
+            </div>
+
+            {data ? (
+              <MessageTable
+                data={data as Message[]}
+                setMessage={setActiveMessage}
+                activeMessage={activeMessage}
+              />
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
+          <div>
+            <div className={styles.row}>{activeMessage?.text}</div>
+          </div>
         </div>
         {openImports && (
           <ImportEmailsModal onClose={() => setOpenImports(false)} />
@@ -108,9 +119,14 @@ function useFilteredData() {
   const [page, setPage] = useState<number>(0);
   const [sender, setSender] = useState<string | undefined>();
 
+  const [activeMessage, setActiveMessage] = useState<undefined | Message>();
   useEffect(() => {
     setPage(0);
   }, [sender]);
+
+  useEffect(() => {
+    setActiveMessage(undefined);
+  }, [page, sender]);
   const { data: peopleOptions } = trpc.useQuery(["messages.getPeople"]);
 
   const { data } = trpc.useQuery(["messages.getFiltered", { page, sender }]);
@@ -122,5 +138,7 @@ function useFilteredData() {
     sender,
     setSender,
     data,
+    setActiveMessage,
+    activeMessage,
   };
 }

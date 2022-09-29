@@ -70,6 +70,9 @@
   font-weight: 800;
   line-height: 1.5;
   color: var(--color-gray-700);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 @media (min-width: 768px) {
@@ -199,4 +202,17 @@
 
 .signInButton:hover {
   background-color: rgba(237, 233, 254, 100%);
+}
+
+.row {
+  display: flex;
+  width: 100%;
+}
+
+.column {
+  flex: 50%;
+}
+
+.importButton {
+
 }
