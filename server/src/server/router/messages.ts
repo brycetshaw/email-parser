@@ -6,10 +6,10 @@ export const messagesRouter = createRouter()
   .query("getFiltered", {
     input: z
       .object({
-        id: z.string().nullable(),
-        sender: z.string().nullable(),
-        recipient: z.string().nullable(),
-        page: z.number(),
+        id: z.string().nullish(),
+        sender: z.string().nullish(),
+        recipient: z.string().nullish(),
+        page: z.number().nullish(),
       })
       .nullish(),
     async resolve({ input }) {
@@ -50,5 +50,13 @@ export const messagesRouter = createRouter()
     }),
     resolve: async ({ input: { username, password, howMany } }) => {
       await getSomeEmails(username, password, howMany);
+    },
+  })
+
+  .query("getPeople", {
+    input: z.object({}).nullish(),
+    async resolve({ input }) {
+      if (!prisma) throw new Error("invalid DB context");
+      return prisma.person.findMany();
     },
   });

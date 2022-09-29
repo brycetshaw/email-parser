@@ -1,24 +1,27 @@
 import { Message } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "../utils/trpc";
 import styles from "./index.module.css";
 import {
   Button,
   Grid,
   GridItem,
-  Table,
-  TableContainer,
-  Td,
-  Th,
-  Tr,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
+  StackItem,
 } from "@chakra-ui/react";
 import { ImportEmailsModal } from "../components/importEmails";
 import { MessageTable } from "../components/messageTable";
 
 const Home: NextPage = () => {
-  const { data } = trpc.useQuery(["messages.getFiltered"]);
+  const { setPage, page, sender, setSender, peopleOptions, data } =
+    useFilteredData();
+
   const [message, setMessage] = useState<undefined | Message>();
 
   const [openImports, setOpenImports] = useState(false);
@@ -44,8 +47,36 @@ const Home: NextPage = () => {
             templateRows="repeat(5, 1fr)"
             templateColumns="repeat(3, 1fr)"
           >
-            <GridItem colSpan={1} rowSpan={2} bg={"lightseagreen"}>
-              Filters
+            <GridItem>
+              <Stack>
+                <StackItem>
+                  <Menu>
+                    <MenuButton as={Button}>
+                      Sender{sender ? `: ${sender}` : ""}
+                    </MenuButton>
+                    <MenuList>
+                      {peopleOptions?.map(({ email }) => (
+                        <MenuItem
+                          onClick={(e) => setSender(email)}
+                          key={`sender-option-${email}`}
+                        >
+                          {email}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                </StackItem>
+                <StackItem>
+                  <Button
+                    disabled={page <= 0}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    {"<"}
+                  </Button>{" "}
+                  {page}{" "}
+                  <Button onClick={() => setPage(page + 1)}>{">"}</Button>
+                </StackItem>
+              </Stack>
             </GridItem>
             <GridItem colSpan={2} rowSpan={5} bg={"lightgrey"}>
               {message?.text}
@@ -72,3 +103,24 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+function useFilteredData() {
+  const [page, setPage] = useState<number>(0);
+  const [sender, setSender] = useState<string | undefined>();
+
+  useEffect(() => {
+    setPage(0);
+  }, [sender]);
+  const { data: peopleOptions } = trpc.useQuery(["messages.getPeople"]);
+
+  const { data } = trpc.useQuery(["messages.getFiltered", { page, sender }]);
+
+  return {
+    peopleOptions,
+    page,
+    setPage,
+    sender,
+    setSender,
+    data,
+  };
+}
