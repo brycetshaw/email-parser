@@ -1,4 +1,4 @@
-import { Message, Person } from "@prisma/client";
+import { Message } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
@@ -15,17 +15,11 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { ImportEmailsModal } from "../components/importEmails";
-
-type IMessage =
-  | (Message & {
-      from: Person;
-      to: Person[];
-    })
-  | Message;
+import { MessageTable } from "../components/messageTable";
 
 const Home: NextPage = () => {
   const { data } = trpc.useQuery(["messages.getFiltered"]);
-  const [message, setMessage] = useState<undefined | IMessage>();
+  const [message, setMessage] = useState<undefined | Message>();
 
   const [openImports, setOpenImports] = useState(false);
 
@@ -59,7 +53,7 @@ const Home: NextPage = () => {
             <GridItem rowSpan={4} colSpan={1}>
               {data ? (
                 <MessageTable
-                  data={data as IMessage[]}
+                  data={data as Message[]}
                   setMessage={setMessage}
                   activeMessage={message}
                 />
@@ -78,52 +72,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-const MessageTable = ({
-  data,
-  setMessage,
-  activeMessage,
-}: {
-  data: IMessage[];
-  activeMessage: IMessage | undefined;
-  setMessage: (message: IMessage) => void;
-}) => {
-  const headers = ["Sender", "Subject"];
-
-  return (
-    <TableContainer>
-      <Table>
-        <Tr>
-          {headers.map((subject) => (
-            <Th key={subject}>{subject}</Th>
-          ))}
-        </Tr>
-        {data?.map((message) => (
-          <MessageTableRow
-            message={message}
-            onClick={() => setMessage(message)}
-            active={activeMessage?.id === message.id}
-            key={`message=${message.id}`}
-          />
-        ))}
-      </Table>
-    </TableContainer>
-  );
-};
-
-const MessageTableRow = ({
-  message: { senderEmail, subject },
-  active,
-  onClick,
-}: {
-  message: Message;
-  active: boolean;
-  onClick: () => void;
-}) => {
-  return (
-    <Tr className={active ? styles.activeRow : ""} onClick={onClick}>
-      <Td>{senderEmail}</Td>
-      <Td>{subject}</Td>
-    </Tr>
-  );
-};

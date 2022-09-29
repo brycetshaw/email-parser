@@ -27,50 +27,67 @@ export function ImportEmailsModal({
 }: {
   onClose: () => void;
 }): JSX.Element {
-  const { mutate } = trpc.useMutation(["messages.addMessage"], {
+  const { mutate } = trpc.useMutation(["messages.seedDataBase"], {
     onSuccess: async () => {
       await trpc.useContext().invalidateQueries(["messages.getFiltered"]);
     },
   });
-  const [stuff, setStuff] = useState<Inputs>({ email: "" });
+  const [email, setEmail] = useState<string | undefined>(
+    "shaw.bryce@gmail.com"
+  );
+  const [password, setPassword] = useState<string | undefined>(
+    "mvlrptczkeknaank"
+  );
+
+  const [howMany, setHowMany] = useState(100);
+
+  const handleSubmit = () => {
+    mutate({
+      password: password as string,
+      username: email as string,
+      howMany,
+    });
+    onClose();
+  };
 
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Seed Db</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing={3}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                console.log();
-              }}
+            <InputGroup>
+              <InputLeftAddon>Email</InputLeftAddon>
+              <Input
+                size="md"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftAddon>App Password</InputLeftAddon>
+              <Input
+                size="md"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftAddon>How Many?</InputLeftAddon>
+              <Input
+                size="md"
+                value={howMany}
+                onChange={(e) => setHowMany(Number(e.target.value))}
+              />
+            </InputGroup>
+            <Button
+              disabled={!password || !email || !howMany}
+              onClick={handleSubmit}
             >
-              <InputGroup>
-                <InputLeftAddon>Email</InputLeftAddon>
-
-                <Input
-                  placeholder="medium size"
-                  title="lol"
-                  size="md"
-                  value={stuff.email as string}
-                  onChange={(e) =>
-                    setStuff({ ...stuff, email: e.target.textContent })
-                  }
-                />
-              </InputGroup>
-
-              <Input placeholder="medium size" size="md" />
-              <Input placeholder="medium size" size="md" />
-
-              <Button
-                onClick={() => mutate({ password: null, username: null })}
-              >
-                Submit
-              </Button>
-            </form>
+              Submit
+            </Button>
           </Stack>
         </ModalBody>
 
@@ -78,7 +95,6 @@ export function ImportEmailsModal({
           <Button colorScheme="blue" mr={3} onClick={onClose}>
             Close
           </Button>
-          <Button variant="ghost">Secondary Action</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

@@ -16,13 +16,18 @@ export const messagesRouter = createRouter()
       if (!prisma) throw new Error("invalid DB context");
 
       const { id, recipient, sender, page } = input ?? {};
+
       const take = 10;
       const skip = (page ?? 0) * take;
+
+      // return single result if the id is provided
       if (id != null) {
-        return prisma.message.findUnique({
-          where: { id },
-          include: { from: true, to: true },
-        });
+        return [
+          prisma.message.findUnique({
+            where: { id },
+            include: { from: true, to: true },
+          }),
+        ];
       }
 
       return prisma.message.findMany({
@@ -37,12 +42,13 @@ export const messagesRouter = createRouter()
       });
     },
   })
-  .mutation("addMessage", {
+  .mutation("seedDataBase", {
     input: z.object({
-      username: z.string().nullable(),
-      password: z.string().nullable(),
+      username: z.string(),
+      password: z.string(),
+      howMany: z.number(),
     }),
-    resolve: async ({ input: { username, password } }) => {
-      await getSomeEmails("shaw.bryce@gmail.com", "mvlrptczkeknaank");
+    resolve: async ({ input: { username, password, howMany } }) => {
+      await getSomeEmails(username, password, howMany);
     },
   });

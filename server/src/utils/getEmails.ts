@@ -3,7 +3,11 @@ import Imap from "node-imap";
 import { inspect } from "util";
 import console from "console";
 import { EmailAddress, ParsedMail } from "mailparser";
-export async function getSomeEmails(user: string, password: string) {
+export async function getSomeEmails(
+  user: string,
+  password: string,
+  howMany: number
+) {
   const imap = new Imap({
     user,
     password,
@@ -25,7 +29,7 @@ export async function getSomeEmails(user: string, password: string) {
       console.log(box.messages.total + " message(s) found!");
       // 1:* - Retrieve all messages
       // 3:5 - Retrieve messages #3,4,5
-      const f = imap.seq.fetch("1:100", {
+      const f = imap.seq.fetch(`1:${howMany}`, {
         bodies: "",
       });
       f.on("message", function (msg, seqno) {
@@ -71,10 +75,6 @@ async function parseAndPersistMessage(message: ParsedMail): Promise<boolean> {
   try {
     // parse the message
     const { from, text, subject, date, to } = message;
-
-    // This only supports single recipients at the moment.
-    const recipient = ((Array.isArray(to) && to[0]?.value) ||
-      (!Array.isArray(to) && to?.value)) as EmailAddress | undefined;
 
     type UsersDTO = { name: string; address: string | undefined };
 
