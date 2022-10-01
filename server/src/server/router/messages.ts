@@ -33,7 +33,7 @@ export const messagesRouter = createRouter()
       return prisma.message.findMany({
         where: {
           ...(sender && { senderEmail: { equals: sender } }),
-          ...(recipient && { recipient: { equals: recipient } }),
+          // ...(recipient && { recipient: { equals: recipient } }),
         },
         include: { from: true, to: true },
         orderBy: { date: "asc" },

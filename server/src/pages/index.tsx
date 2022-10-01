@@ -71,6 +71,7 @@ const Home: NextPage = () => {
                             }
                             key={`sender-option-${email}`}
                           >
+                            {}
                             {email}
                           </MenuItem>
                         )
