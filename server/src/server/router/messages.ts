@@ -15,7 +15,7 @@ export const messagesRouter = createRouter()
     async resolve({ input }) {
       if (!prisma) throw new Error("invalid DB context");
 
-      const { id, recipient, sender, page } = input ?? {};
+      const { id, sender, page } = input ?? {};
 
       const take = 10;
       const skip = (page ?? 0) * take;
@@ -55,7 +55,7 @@ export const messagesRouter = createRouter()
 
   .query("getSenders", {
     input: z.object({}).nullish(),
-    async resolve({ input }) {
+    async resolve({}) {
       if (!prisma) throw new Error("invalid DB context");
       const peopleOptions = await prisma.person.findMany({
         include: { _count: { select: { sentMessages: true } } },

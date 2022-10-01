@@ -1,13 +1,5 @@
 import { Message } from "@prisma/client";
-import {
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Table, TableContainer, Tbody, Td, Th, Tr } from "@chakra-ui/react";
 
 import styles from "./messageTable.module.css";
 export const MessageTable = ({

@@ -2,7 +2,7 @@ import { simpleParser } from "mailparser";
 import Imap from "node-imap";
 import { inspect } from "util";
 import console from "console";
-import { EmailAddress, ParsedMail } from "mailparser";
+import { ParsedMail } from "mailparser";
 export async function getSomeEmails(
   user: string,
   password: string,
@@ -35,7 +35,7 @@ export async function getSomeEmails(
       f.on("message", function (msg, seqno) {
         const prefix = "(#" + seqno + ") ";
 
-        msg.on("body", function (stream, info) {
+        msg.on("body", function (stream) {
           // use a specialized mail parsing library (https://github.com/andris9/mailparser)
           simpleParser(stream, (err, mail) => {
             parseAndPersistMessage(mail);
@@ -115,15 +115,17 @@ async function parseAndPersistMessage(message: ParsedMail): Promise<boolean> {
 
     if (!fromUsers?.length || !toUsers?.length) return false;
 
+    if (fromUsersDto.length !== 1) return false;
+
     // persist the message
     await prisma?.message.create({
       data: {
         from: {
-          connect: { email: fromUsersDto[0]!.address as string },
+          connect: { email: fromUsersDto[0]?.address as string },
         },
         text: text ?? "",
         to: {
-          connect: toUsersDto.map(({ name, address }) => ({ email: address })),
+          connect: toUsersDto.map(({ address }) => ({ email: address })),
         },
         date,
         subject,

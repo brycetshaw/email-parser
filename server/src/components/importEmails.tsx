@@ -2,7 +2,6 @@ import {
   Button,
   Input,
   InputGroup,
-  Text,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,16 +10,10 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  InputLeftElement,
   InputLeftAddon,
-  NumberInputProps,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
-
-interface Inputs {
-  email: string | undefined | null;
-}
 
 export function ImportEmailsModal({
   onClose,

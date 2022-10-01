@@ -6,8 +6,6 @@ import { trpc } from "../utils/trpc";
 import styles from "./index.module.css";
 import {
   Button,
-  Grid,
-  GridItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -66,7 +64,7 @@ const Home: NextPage = () => {
                       {[{ email: "None" }, ...(senderOptions ?? [])]?.map(
                         ({ email }) => (
                           <MenuItem
-                            onClick={(e) =>
+                            onClick={() =>
                               setSender(email === "None" ? undefined : email)
                             }
                             key={`sender-option-${email}`}
