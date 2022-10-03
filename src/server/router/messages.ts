@@ -1,6 +1,7 @@
 import { createRouter } from "./context";
 import { z } from "zod";
 import { getSomeEmails } from "../../utils/getEmails";
+import {prisma} from "../db/client";
 
 export const messagesRouter = createRouter()
   .query("getFiltered", {
@@ -13,7 +14,6 @@ export const messagesRouter = createRouter()
       })
       .nullish(),
     async resolve({ input }) {
-      if (!prisma) throw new Error("invalid DB context");
 
       const { id, sender, page } = input ?? {};
 
@@ -23,14 +23,14 @@ export const messagesRouter = createRouter()
       // return single result if the id is provided
       if (id != null) {
         return [
-          prisma.message.findUnique({
+         await prisma.message.findUnique({
             where: { id },
             include: { from: true, to: true },
           }),
         ];
       }
 
-      return prisma.message.findMany({
+      return await prisma.message.findMany({
         where: {
           ...(sender && { senderEmail: { equals: sender } }),
           // ...(recipient && { recipient: { equals: recipient } }),
@@ -49,18 +49,18 @@ export const messagesRouter = createRouter()
       howMany: z.number(),
     }),
     resolve: async ({ input: { username, password, howMany } }) => {
-      await getSomeEmails(username, password, howMany);
+      return await getSomeEmails(username, password, howMany);
     },
   })
 
   .query("getSenders", {
     input: z.object({}).nullish(),
-    async resolve({}) {
-      if (!prisma) throw new Error("invalid DB context");
+    async resolve({ input }) {
+      if (!prisma) return false
       const peopleOptions = await prisma.person.findMany({
         include: { _count: { select: { sentMessages: true } } },
       });
 
-      return peopleOptions?.filter(({ _count }) => _count.sentMessages);
+      return await peopleOptions?.filter(({ _count }) => _count.sentMessages);
     },
   });

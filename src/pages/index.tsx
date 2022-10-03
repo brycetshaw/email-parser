@@ -6,6 +6,8 @@ import { trpc } from "../utils/trpc";
 import styles from "./index.module.css";
 import {
   Button,
+  Grid,
+  GridItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -17,17 +19,19 @@ import { ImportEmailsModal } from "../components/importEmails";
 import { MessageTable } from "../components/messageTable";
 
 const Home: NextPage = () => {
+
+  const { data: senderOptions } = trpc.useQuery(["messages.getSenders"]);
+
   const {
     setPage,
     page,
     sender,
     setSender,
-    senderOptions,
-    data,
     setActiveMessage,
     activeMessage,
   } = useFilteredData();
 
+  const { data } = trpc.useQuery(["messages.getFiltered", { page, sender }]);
   const [openImports, setOpenImports] = useState(false);
 
   return (
@@ -61,7 +65,7 @@ const Home: NextPage = () => {
                       Sender{sender ? `: ${sender}` : ""}
                     </MenuButton>
                     <MenuList>
-                      {[{ email: "None" }, ...(senderOptions ?? [])]?.map(
+                      {[{ email: "None" }, ...(Array.isArray(senderOptions) ? senderOptions : [])]?.map(
                         ({ email }) => (
                           <MenuItem
                             onClick={() =>
@@ -126,17 +130,12 @@ function useFilteredData() {
   useEffect(() => {
     setActiveMessage(undefined);
   }, [page, sender]);
-  const { data: senderOptions } = trpc.useQuery(["messages.getSenders"]);
-
-  const { data } = trpc.useQuery(["messages.getFiltered", { page, sender }]);
 
   return {
-    senderOptions,
     page,
     setPage,
     sender,
     setSender,
-    data,
     setActiveMessage,
     activeMessage,
   };
